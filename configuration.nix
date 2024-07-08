@@ -116,7 +116,6 @@
     description = "Haris";
     hashedPasswordFile = "/etc/userhash";
     extraGroups = [ "networkmanager" "wheel" ];
-    # defaultUserShell = pkgs.zsh;
     packages = with pkgs; [
       bitwarden-desktop
       browsh # modern text-based browser running on headless Firefox
