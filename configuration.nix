@@ -109,7 +109,8 @@
 
   users.defaultUserShell = pkgs.zsh;
   users.allowNoPasswordLogin = true;
-  # Define a user account. Don't forget to set a password with ‘passwd’.
+  users.mutableUsers = false;
+  # Don't forget to set password using `mkpasswd -m sha-512` and placing its output in /etc/userhash without new lines
   users.users.haris = {
     isNormalUser = true;
     description = "Haris";
