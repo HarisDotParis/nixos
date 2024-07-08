@@ -113,6 +113,7 @@
   users.users.haris = {
     isNormalUser = true;
     description = "Haris";
+    hashedPasswordFile = "/etc/userhash";
     extraGroups = [ "networkmanager" "wheel" ];
     # defaultUserShell = pkgs.zsh;
     packages = with pkgs; [
