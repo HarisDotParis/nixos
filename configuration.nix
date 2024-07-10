@@ -2,21 +2,25 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
+# Values to be set inside /etc/nixos/local.nix:
+# networking.hostName, networking.domain (optional), networking.hosts (optional),
+# users.users.haris.hashedPassword
+
 { config, pkgs, ... }:
 
 {
   imports = [
       ./hardware-configuration.nix
+      ./local.nix
   ];
 
   # Bootloader.
-  boot.loader = {
-    systemd-boot.enable = true;
-    efi.canTouchEfiVariables = true;
-  };
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
+  boot.initrd.luks.devices."luks-f32e65b3-5610-4b9f-acbd-39732d2ce1b9".device = "/dev/disk/by-uuid/f32e65b3-5610-4b9f-acbd-39732d2ce1b9";
 
   networking = {
-    hostName = "laptop"; # Define your hostname.
     wireless.enable = false;  # Enables wireless support via wpa_supplicant.
     wireless.iwd.enable = true;
     # nameservers = [ "9.9.9.9" "149.112.112.112" "2620:fe::fe" "2620:fe::9" ];
@@ -54,11 +58,10 @@
   # Enable the X11 and WMs/DEs.
   services.xserver = {
     enable = true;
-    windowManager = {
-      awesome.enable = true;
-      awesome.noArgb = true;
-      bspwm.enable = true;
-      i3.enable = true;
+    xkb = {
+      layout = "gb";
+      variant = "";
+      # extraLayouts.haris.keycodesFile =
     };
   };
   services = {
@@ -66,22 +69,9 @@
     displayManager.sddm.enable = true;
     displayManager.defaultSession = "plasma";
   };
-  programs = {
-    xwayland.enable = true;
-    sway.enable = true;
-    hyprland.enable = true;
-    i3lock.enable = true;
-    i3lock.u2fSupport = true;
-  };
+  programs.xwayland.enable = true;
   hardware.opengl.enable = true; # necessary for OpenGL support in X11 & for Wayland compositors
   qt.enable = true;
-
-  # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "gb";
-    variant = "";
-    # extraLayouts.haris.keycodesFile = 
-  };
 
   # Configure console keymap
   console.keyMap = "uk";
@@ -114,7 +104,6 @@
   users.users.haris = {
     isNormalUser = true;
     description = "Haris";
-    hashedPasswordFile = "/etc/userhash";
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
       bitwarden-desktop
@@ -176,13 +165,14 @@
     ausweisapp.openFirewall = true;
     chromium = {
       enable = true;
-      defaultSearchProviderSuggestURL = "https://www.startpage.com/sp/search?query={searchTerms}";
+      # defaultSearchProviderEnabled = true;
+      # defaultSearchProviderSearchURL = "https://eu.startpage.com/sp/search?query={searchTerms}";
+      # defaultSearchProviderSuggestURL = "https://eu.startpage.com/osuggestions?q={searchTerms}";
+      enablePlasmaBrowserIntegration = true;
       extensions = [
         "cjpalhdlnbpafiamejdnhcphjbkeiagm" # ublock origin
         "aeblfdkhhhdcdjpifhhbdiojplfjncoa" # 1Password
-        "eimadpbcbfnmbkopoojfekhnkhdbieeh" # Dark Reader
         "ldpochfccmkkmhdbclfhpagapcfdljkj" # Decentraleyes
-        "cofdbpoegempjloogbagkncekinflcnj" # DeepL Translate
       ];
       # options: https://chromeenterprise.google/intl/en_us/policies/
       extraOpts = {
@@ -193,16 +183,16 @@
         "BlockThirdPartyCookies" = true;
         "BrowserSignin" = 0;
         "BuiltInDnsClientEnabled" = false;
-        "ClearBrowsingDataOnExitList" = [
+        # "ClearBrowsingDataOnExitList" = [
           # "browsing_history"
-          "download_history"
-          "cookies_and_other_site_data"
-          "cached_images_and_files"
-          "password_signin"
-          "autofill"
+          # "download_history"
+          # "cookies_and_other_site_data"
+          # "cached_images_and_files"
+          # "password_signin"
+          # "autofill"
           # "site_settings"
           # "hosted_app_data"
-        ];
+        # ];
         "CloudReportingEnabled" = false;
         "DefaultBrowserSettingEnabled" = false;
         "DefaultCookiesSetting" = 4;
@@ -381,7 +371,6 @@
     less.enable = true;
     neovim.enable = true;
     nm-applet.enable = true;
-    slock.enable = true;
     ssh.startAgent = true;
     steam.enable = true;
     tmux = {
@@ -429,9 +418,11 @@
       ansible
       bat
       colordiff
+      chromium
       deja-dup
       eza
       fd
+      git
       hugo
       kdePackages.ark
       kdePackages.yakuake
@@ -444,6 +435,7 @@
       solaar
       terraform
       tidy-viewer
+      veracrypt
       vifm-full
       wget
       xorg.xkbcomp
